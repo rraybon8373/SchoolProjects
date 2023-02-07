@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>      
+	<title>Subscription Registration - Bottled Air Lakeland</title>
+	<meta name="description" content="Shop at Bottled Air Lakeland for all your bottled air needs. We offer subscriptions for different purities of bottled air at a convenient low price.">
+	<link rel="stylesheet" href="css/universal.css">
+	<link rel="stylesheet" href="css/products.css">
+	<link rel="stylesheet" href="css/registration.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+	  
+	<script type="text/javascript" language="javascript" src="js/registration.js"></script> 
+
+	<script type="application/ld+json">{
+		"@context": "http://schema.org",
+		"@type": "WebApplication",
+		"@id": "Bottled_Air_Lakeland",
+		"applicationCategory": "BusinessApplication",
+		"name": "Bottled Air Lakeland Subscription",
+		"operatingSystem": "all",
+ 		"browserRequirements": "Requires Javascript and HTML5 support",
+		"url": "https://bottledairlakeland.com/registration.html",
+		"aggregateRating": {
+			"@type": "AggregateRating",
+			"ratingValue": "4.8",
+			"bestRating": "5",
+			"worstRating": "1",
+			"ratingCount": "224"
+		},
+		"offers": {
+			"@type": "AggregateOffer",
+			"offeredBy": {
+				"@type": "Organization",
+				"name":"Bottled Air Lakeland"
+			},
+			"priceCurrency": "USD",
+			"priceSpecification": [
+				{
+					"@type": "UnitPriceSpecification",
+					"priceCurrency": "USD",
+					"name": "Semipure Air (50% Purity)"
+				},
+				{
+					"@type": "UnitPriceSpecification",
+					"priceCurrency": "USD",
+					"name": "Pure Air (80% Purity)"
+				},
+				{
+					"@type": "UnitPriceSpecification",
+					"priceCurrency": "USD",
+					"name": "Ultrapure Air (100% Purity)"
+				}
+			]
+		},
+		"creator": {
+			"@type":"Organization",
+			"@id":"#organization",
+			"url":"https://bottledairlakeland.com",
+			"name":"Bottled Air Lakeland"
+		},
+		"keywords": [
+			"bottled air",
+			"bottled air lakeland",
+			"bottled",
+			"air"
+		]
+	}
+	</script>
+</head>
+<body>
+	<header>
+		<ul>
+			<li><a href="index.html">Bottled Air Lakeland</a></li>
+			<div class="headerlinks">
+				<li><a href="products.html">Products</a></li>
+				<li><a href="blog.html">Blog</a></li>
+				<li><a href="aboutus.html">About Us</a></li>
+			</div>
+		</ul>
+	</header>
+	<main>
+		<div class="form-box">
+		<h1>Registration</h1>
+		
+		<form method="get" action="#" id="sampleForm">
+		
+		<hr>
+
+		<form method="get" action="#" name="sampleForm">
+		<label class="icon" for="firstname">First Name</label>
+		<input type="text" name="firstname" id="firstname" placeholder="First Name" />
+
+		<label class="icon" for="lastname">Last Name</label>
+		<input type="text" name="lastname" id="lastname" placeholder="Last Name" />
+
+		<label class="icon" for="phonenumber">Phone Number</label>
+		<input type="number" name="phonenumber" pattern="[0-9]*" id="phonenumber" placeholder="Phone Number" />
+    
+		<label class="icon" for="email">Email</label>
+		<input type="text" name="email" id="email" placeholder="Email" />   
+    
+		<label class="icon" for="password">Password</label>
+		<input type="password" name="password" id="password" placeholder="Password" />         
+
+		<label class="icon" for="airsub1">Weekly</label>
+		<input type="radio" id="airsub1" name="airsub" value="Air Subscription 1"><br>
+
+		<label class="icon" for="airsub2">Monthly</label>
+		<input type="radio" id="airsub2" name="airsub" value="Air Subscription 2"><br>
+
+		<label class="icon" for="airsub3">Yearly</label>
+		<input type="radio" id="airsub3" name="airsub" value="Air Subscription 3"><br>
+
+		<label class="icon" for="airquality">Air Quality</label>
+		<input type="list" list="airqualities" name="airquality" id="airquality">
+		<datalist id="airqualities">
+			<option value="50% Purity">
+			<option value="80% Purity">
+			<option value="100% Purity">
+		</datalist>
+		</input>
+
+		<button type="submit" id="submit"><i class="fa fa-reply fa-fw"></i> Submit</button> 
+		<button id="reset">Reset</button>
+		</form>
+		<h2 id="submitConfirmation" class="hidden"></h2>
+		</div>
+	</main>
+	<footer>
+		<txt>Questions or concerns? Call 268-853-3247 now!</txt>
+	</footer>
+</body>
+</html>

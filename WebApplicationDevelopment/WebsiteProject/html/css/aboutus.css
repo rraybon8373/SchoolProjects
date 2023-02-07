@@ -1,0 +1,15 @@
+.aboutustext{
+	font-family: 'Lora', serif;
+	font-size: 20px;
+	height: max-content;
+	text-align: center;
+	margin-left: 8rem;
+	margin-right: 8rem;
+}
+
+.main {
+	height: max-content;
+}
+.spacing {
+	height: 10px;
+}

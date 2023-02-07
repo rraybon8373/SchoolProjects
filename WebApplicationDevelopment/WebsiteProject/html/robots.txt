@@ -1,0 +1,16 @@
+User-agent: *
+Disallow: /css/
+Disallow: /js/
+Allow: /
+
+User-agent: AdsBot-Google
+Disallow: /css/
+Disallow: /js/
+Allow: /
+
+User-agent: Googlebot
+Disallow: /css/
+Disallow: /js/
+Allow: /
+
+Sitemap: http://bottledairlakeland.com/sitemap.xml

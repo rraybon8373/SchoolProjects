@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Comfortaa:wght@400;700&family=Lato:wght@300;400&display=swap');
+#logo{
+    
+    font-family: 'Comfortaa', cursive;
+}
+.main {
+    margin-top: 30px;
+	background-color:rgb(255, 255, 255,0.5);
+	height:calc(fit-content+20px);
+	box-shadow: 0px 0px 10px 10px rgba(255, 255, 255, 0.5);
+    padding-top: 5px;
+}
+
+#description{
+    background-color: #36b1da;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    font-size: 20px;
+    color: white;
+    text-align: center;
+    font-family: 'Bebas Neue', cursive;
+}
+#fptext{
+    text-align: center;
+    font-size: 55px;
+    font-family: 'Bebas Neue', cursive;
+}
+
+#shopbtn{
+    margin-top: 90px;
+    -webkit-text-stroke: .001px rgb(0, 0, 0);
+    color: white;
+    font-size: 30px;
+    font-family: 'Bebas Neue', cursive;
+    background-color:#36b1da;
+}
+header{
+    height: 70px;
+}
+#prod1title{
+    font-size: 35px;
+    font-family: 'Bebas Neue', cursive;
+    color: white;
+    -webkit-text-stroke: .001px#347286;
+}
