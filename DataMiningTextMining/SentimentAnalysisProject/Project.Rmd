@@ -1,0 +1,148 @@
+---
+title: "Data and Text Mining Project"
+author: "Richard Raybon - rraybon8373@floridapoly.edu"
+subtitle: Text-Mining
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+library(tidyverse)
+library(tidytext)
+library(tidyr)
+library(wordcloud)
+library(reshape2)
+```
+
+
+```{r}
+data = read_csv("https://raw.githubusercontent.com/reisanar/datasets/master/hp.csv")
+head(data)
+```
+
+
+```{r}
+dim(data)
+```
+
+This is so the books will sort by order automatically
+```{r}
+data$book[data$book =="Philosopher's Stone"] <- "1. Philosopher's Stone"
+data$book[data$book =="Chamber of Secrets"] <- "2. Chamber of Secrets"
+data$book[data$book =="Prisoner of Azkaban"] <- "3. Prisoner of Azkaban"
+data$book[data$book =="Goblet of Fire"] <- "4. Goblet of Fire"
+data$book[data$book =="Order of the Phoenix"] <- "5. Order of the Phoenix"
+data$book[data$book =="Half-Blood Prince"] <- "6. Half-Blood Prince"
+data$book[data$book =="Deathly Hallows"] <- "7. Deathly Hallows"
+```
+
+
+Tokenize data + remove stopwords
+```{r}
+better_data <- data %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+head(better_data)
+```
+
+
+```{r}
+wordcloud <- better_data %>% count(word) %>%
+  with(wordcloud(word, n, max.words=100))
+```
+
+tf_idf
+```{r}
+data %>%
+  unnest_tokens(word, text) %>%
+  count(book, word, sort=TRUE) %>%
+  bind_tf_idf(word, book, n) %>%
+  arrange(desc(tf_idf))
+```
+
+Bing
+```{r}
+bing_data <- better_data %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(book,sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+bing_data
+```
+
+
+```{r}
+bing_data %>%
+  ggplot(aes(x=sentiment, y=book, fill=book)) + 
+    geom_bar(stat="identity", orientation="y") +
+    scale_y_discrete(limits=rev) + 
+    scale_x_continuous(trans="reverse")
+```
+
+
+```{r}
+wordcloud_sentiment <- better_data %>% inner_join(get_sentiments("bing")) %>% 
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word~sentiment, value.var ="n", fill=0) %>%
+  comparison.cloud(colors = c("blue","red"), max.words=60)
+```
+
+
+Afinn
+```{r}
+afinn_data <- better_data %>%
+  inner_join(get_sentiments("afinn")) %>%
+  count(book, value) %>%
+  spread(value, n, fill = 0) %>%
+  mutate(sentiment = `-5`*-5 + `-4`*-4 + `-2`*-2 + `-2`*-2 + `-1`*-1 + `1`*1 + `2`*2 + `3`*3 + `4`*4 + `5`*5) %>%
+  select(-`-5`,-`-4`,-`-3`,-`-2`,-`-1`,-`1`,-`2`,-`3`,-`4`,-`5`)
+
+afinn_data
+```
+
+
+```{r}
+afinn_data %>%
+  ggplot(aes(x=sentiment, y=book, fill=book)) + 
+    geom_bar(stat="identity", orientation="y") +
+    scale_y_discrete(limits=rev) + 
+    scale_x_continuous(trans="reverse")
+```
+
+NRC
+```{r}
+nrc_data <- better_data %>%
+  inner_join(get_sentiments("nrc")) %>%
+  count(book, sentiment)
+
+nrc_data %>%
+  spread(sentiment, n, fill = 0)
+```
+
+
+```{r}
+nrc_data %>%
+  ggplot(aes(x=book, y = n, fill = book)) + 
+    geom_bar(stat="identity") + 
+    facet_wrap(vars(sentiment)) + 
+    theme(axis.title=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank())
+```
+
+Plotting both afinn and bing methods for visualization purposes
+```{r}
+rbind(bing_data %>% 
+  select(-positive, -negative) %>%
+  mutate(method="bing"), afinn_data %>%
+  mutate(method="afinn")) %>% 
+  arrange(book,desc(method)) %>% 
+  ggplot(aes(x=sentiment, y=paste(book, method), fill=method)) + 
+    geom_bar(stat="identity", orientation="y") +
+    scale_y_discrete(limits=rev) + 
+    scale_x_continuous(trans="reverse")
+```
+
