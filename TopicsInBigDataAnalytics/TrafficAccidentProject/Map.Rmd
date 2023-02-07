@@ -1,0 +1,50 @@
+---
+title: "Map"
+author: "Richard Raybon"
+date: '2022-12-04'
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+rawdata = read_csv("Traffic_Crashes.csv")
+```
+
+
+```{r}
+head(rawdata)
+dim(rawdata)
+```
+
+
+```{r}
+data <- rawdata %>%
+  mutate(AnyInjuries = ifelse(INJURIES_TOTAL > 0, "yes", "no"))
+```
+
+
+```{r}
+data[!(is.na(data$INJURIES_TOTAL)),] %>%
+  filter(LATITUDE > 0) %>%
+  ggplot(aes(x=LONGITUDE,y=LATITUDE, color=AnyInjuries)) +
+    scale_color_manual(values=c("#d3d3d3","#FA8072")) + 
+    scale_fill_manual(values=c("#d3d3d3","#FA8072")) + 
+    geom_point(alpha=0.4, size=0.5) + 
+    coord_fixed()
+```
+
+
+```{r}
+data[!(is.na(data$INJURIES_TOTAL)),] %>%
+  filter(LATITUDE > 0) %>%
+  ggplot(aes(x=LONGITUDE,y=LATITUDE, color=AnyInjuries)) +
+    scale_color_manual(values=c("#d3d3d3","#FA8072")) + 
+    scale_fill_manual(values=c("#d3d3d3","#FA8072")) + 
+    geom_point(alpha=0.4, size=0.5) + 
+    stat_density_2d(aes(alpha=after_stat(level),fill=AnyInjuries), geom="polygon") + 
+    coord_fixed()
+```

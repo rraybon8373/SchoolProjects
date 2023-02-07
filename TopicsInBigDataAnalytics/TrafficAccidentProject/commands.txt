@@ -1,0 +1,64 @@
+from pyspark.ml import Pipeline
+from pyspark.ml.classification import DecisionTreeClassifier
+from pyspark.ml.feature import StringIndexer, VectorIndexer, VectorAssembler, MinMaxScaler
+from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+from pyspark.mllib.util import MLUtils
+from pyspark.sql.functions import *
+
+data = spark.read.options(header='True', inferSchema='True').csv("gs://bigdata_rr8373/Traffic_Crashes.csv")
+
+new_data = data.withColumn('label',when(data.INJURIES_TOTAL>0,"Had Injuries").when(data.INJURIES_TOTAL==0,"No Injuries"))
+
+new_data = new_data.select("POSTED_SPEED_LIMIT", "TRAFFIC_CONTROL_DEVICE", "DEVICE_CONDITION", "WEATHER_CONDITION", "LIGHTING_CONDITION", "FIRST_CRASH_TYPE", "TRAFFICWAY_TYPE", "ALIGNMENT", "ROADWAY_SURFACE_COND", "ROAD_DEFECT", "REPORT_TYPE", "CRASH_TYPE", "DAMAGE", "PRIM_CONTRIBUTORY_CAUSE", "SEC_CONTRIBUTORY_CAUSE", "STREET_DIRECTION", "NUM_UNITS", "CRASH_HOUR", "CRASH_DAY_OF_WEEK", "CRASH_MONTH", "LATITUDE", "LONGITUDE", "label")
+
+new_data = new_data.na.drop()
+
+(trainingData,testData) = new_data.randomSplit([0.7,0.3])
+
+LabelIndexer = StringIndexer(inputCol="label", outputCol="indexedLabel", handleInvalid = "keep")
+
+TrafficDeviceIndexer = StringIndexer(inputCol="TRAFFIC_CONTROL_DEVICE", outputCol="indexedTrafficDevice", handleInvalid = "keep")
+DeviceCondIndexer = StringIndexer(inputCol="DEVICE_CONDITION", outputCol="indexedDeviceCond", handleInvalid = "keep")
+WeatherCondIndexer = StringIndexer(inputCol="WEATHER_CONDITION", outputCol="indexedWeatherCond", handleInvalid = "keep")
+LightingCondIndexer = StringIndexer(inputCol="LIGHTING_CONDITION", outputCol="indexedLightingCond", handleInvalid = "keep")
+FirstCrashTypeIndexer = StringIndexer(inputCol="FIRST_CRASH_TYPE", outputCol="indexedFirstCrashType", handleInvalid = "keep")
+TrafficwayTypeIndexer = StringIndexer(inputCol="TRAFFICWAY_TYPE", outputCol="indexedTrafficwayType", handleInvalid = "keep")
+AlignmentIndexer = StringIndexer(inputCol="ALIGNMENT", outputCol="indexedAlignment", handleInvalid = "keep")
+RoadCondIndexer = StringIndexer(inputCol="ROADWAY_SURFACE_COND", outputCol="indexedRoadCond", handleInvalid = "keep")
+RoaddefectIndexer = StringIndexer(inputCol="ROAD_DEFECT", outputCol="indexedRoaddefect", handleInvalid = "keep")
+ReportTypeIndexer = StringIndexer(inputCol="REPORT_TYPE", outputCol="indexedReportType", handleInvalid = "keep")
+CrashTypeIndexer = StringIndexer(inputCol="CRASH_TYPE", outputCol="indexedCrashType", handleInvalid = "keep")
+DamageIndexer = StringIndexer(inputCol="DAMAGE", outputCol="indexedDamage", handleInvalid = "keep")
+PrimCauseIndexer = StringIndexer(inputCol="PRIM_CONTRIBUTORY_CAUSE", outputCol="indexedPrimCause", handleInvalid = "keep")
+SecCauseIndexer = StringIndexer(inputCol="SEC_CONTRIBUTORY_CAUSE", outputCol="indexedSecCause", handleInvalid = "keep")
+StreetDirIndexer = StringIndexer(inputCol="STREET_DIRECTION", outputCol="indexedStreetDir", handleInvalid = "keep")
+
+categorVect = VectorAssembler(inputCols = ["POSTED_SPEED_LIMIT", "indexedTrafficDevice", "indexedDeviceCond", "indexedWeatherCond", "indexedLightingCond", "indexedFirstCrashType", "indexedTrafficwayType", "indexedAlignment", "indexedRoadCond", "indexedRoaddefect", "indexedReportType", "indexedCrashType", "indexedDamage", "indexedPrimCause", "indexedSecCause", "indexedStreetDir", "CRASH_HOUR", "CRASH_DAY_OF_WEEK", "CRASH_MONTH"], outputCol="categorFeatures")
+
+categorIndexer = VectorIndexer(inputCol = categorVect.getOutputCol(), outputCol = "indexedCategorFeatures")
+
+continuVect = VectorAssembler(inputCols = ["NUM_UNITS","LATITUDE","LONGITUDE"], outputCol="continuFeatures")
+
+minMax = MinMaxScaler(inputCol = continuVect.getOutputCol(), outputCol="normalizedContinuousFeatures")
+featuresVect = VectorAssembler(inputCols=["indexedCategorFeatures","normalizedContinuousFeatures"],outputCol="features")
+dt = DecisionTreeClassifier(labelCol="indexedLabel",featuresCol="features",maxBins=41)
+
+pipeline = Pipeline(stages=[LabelIndexer, TrafficDeviceIndexer, DeviceCondIndexer, WeatherCondIndexer, LightingCondIndexer, FirstCrashTypeIndexer, TrafficwayTypeIndexer, AlignmentIndexer, RoadCondIndexer, RoaddefectIndexer, ReportTypeIndexer, CrashTypeIndexer, DamageIndexer, PrimCauseIndexer, SecCauseIndexer, StreetDirIndexer, categorVect, categorIndexer, continuVect, minMax, featuresVect, dt])
+
+model = pipeline.fit(trainingData)
+predictions = model.transform(testData)
+
+eval_accuracy = MulticlassClassificationEvaluator(labelCol="indexedLabel",predictionCol="prediction",metricName="accuracy")
+eval_precision = MulticlassClassificationEvaluator(labelCol="indexedLabel",predictionCol="prediction",metricName="precisionByLabel")
+eval_recall = MulticlassClassificationEvaluator(labelCol="indexedLabel",predictionCol="prediction",metricName="recallByLabel")
+eval_f1 = MulticlassClassificationEvaluator(labelCol="indexedLabel",predictionCol="prediction",metricName="f1")
+accuracy = eval_accuracy.evaluate(predictions)
+precision = eval_precision.evaluate(predictions)
+recall = eval_recall.evaluate(predictions)
+f1 = eval_f1.evaluate(predictions)
+accuracy
+precision
+recall
+f1
+print(model.stages[-1].toDebugString)
+print(model.stages[-1].featureImportances)
